@@ -70,8 +70,19 @@ private:
     void splitInternal(BPlusTreeNode* node);
 
 public:
+    // defualt constructor
+    BPlusTree() : root(nullptr), maxKeys(4) {} // default order
+
     // Constructor
-    BPlusTree(int order);
+    BPlusTree(int order){
+        root = nullptr;
+        maxKeys = order - 1; // max keys is order - 1
+    }
+
+    // deconstructor 
+    ~BPlusTree(){
+        destroyTree(root);// calling helper function
+    }
 
     // Main public operations
     void insert(const string& key, const Record& record);
@@ -83,4 +94,22 @@ public:
 
     // Getter for root if needed for debugging
     BPlusTreeNode* getRoot() const;
+
+    // helper functions
+    void destroyTree(BPlusTreeNode* node);
+    void insertIntoLeaf(BPlusTreeNode* leaf, const string& key, const Record& record);
+    void splitLeaf(BPlusTreeNode* leaf);
+    BPlusTreeNode* findleaf(const string& key);
+
+
+    // getters
+    BPlusTreeNode* getRoot() const{
+        return root;
+    }
+
+    // setters
+    void setRoot(BPlusTreeNode* r){
+        root = r;
+    }
+
 };
