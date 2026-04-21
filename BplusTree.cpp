@@ -165,7 +165,61 @@ void BPlusTree::serialize(const string &dbFilename)
 
         current = current->getNext();
     }
-
     outFile.close();
+}
 
+void BPlusTree::deserialize(const string &dbFilename)
+{
+     // Open the file where the index will be saved
+    ofstream outFile(dbFilename);
+
+    // Make sure the file opened successfully
+    if (!outFile.is_open())
+    {
+        cout << "Error: Could not open file " << dbFilename << " for writing." << endl;
+        return;
+    }
+
+    // If the tree is empty, there is nothing to save
+    if (root == nullptr)
+    {
+        outFile.close();
+        return;
+    }
+
+    // Move down to the leftmost leaf node
+    BPlusTreeNode* current = root;
+    while (!current->getIsLeaf())
+    {
+        current = current->getChildren()[0];
+    }
+
+    // Traverse all leaf nodes using the next pointer
+    while (current != nullptr)
+    {
+        vector<string>& keys = current->getKeys();
+        vector<Record>& records = current->getRecords();
+
+        // Write each key and its matching record to the file
+        for (int i = 0; i < static_cast<int>(keys.size()); i++)
+        {
+            // Write the key first
+            outFile << keys[i];
+
+            // Then write all fields from the record separated by '|'
+            for (int j = 0; j < static_cast<int>(records[i].fields.size()); j++)
+            {
+                outFile << "|" << records[i].fields[j];
+            }
+
+            // End this record on a new line
+            outFile << endl;
+        }
+
+        // Move to the next leaf node
+        current = current->getNext();
+    }
+
+    // Close the file when finished
+    outFile.close();
 }

@@ -1,29 +1,17 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <sstream>
-#include <fstream>
-#include <unordered_map>
-#include <unordered_set>
+#include "BplusTree.hpp"
+
+void peekCSV(const string& filename);
+void uploadCSV(const string& filename, const string& primaryCol, BPlusTree& tree);
+Record parseRow(const string& line);
+int findColumnIndex(const vector<string>& headers, const string& columnName);
+
+vector<string> parseHeader(const string& line);
+string makeIndexFilename(const string& csvFilename);
+void printRecord(const Record& record);
+void printHelp();
 
 
-using namespace std;
-
-void parse(const string& filename, const string& primaryCol);
-
-void peek(const string& filename);
-
-void search(const string& filename, const string& primaryCol, const string& key);
-
-void findRow(const string& filename, const string& primaryCol, const string& key);
-
-void findColumn(const string& filename, const string& columnName);
-
-void uploadCSV(const string& filename, const string& primaryCol);
-
-BPlusTreeNode* findLeaf(const string& key);
-
-void insert(const string& filename, const string& primaryCol, const vector<string>& newRecord);
-
-
+void handlePeek(const string& filename);
+void handleUpload(const string& filename, const string& primaryCol);
+void handleFind(const string& csvName, const string& keyValue);
+void run_app();
