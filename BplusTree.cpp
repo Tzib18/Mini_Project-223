@@ -44,7 +44,7 @@ void BPlusTree::splitLeaf(BPlusTreeNode* leaf){
     insertIntoParent(leaf, promotedKey, newLeaf);
 }
 
-BPlusTreeNode* BPlusTree::findleaf(const string& key){
+BPlusTreeNode* BPlusTree::findLeaf(const string& key){
     if(root == nullptr)
     {
         return nullptr; // tree is empty
