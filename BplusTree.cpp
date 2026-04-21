@@ -44,6 +44,98 @@ void BPlusTree::splitLeaf(BPlusTreeNode* leaf){
     insertIntoParent(leaf, promotedKey, newLeaf);
 }
 
+void BPlusTree::insertIntoParent(BPlusTreeNode *leftNode, const string &promotedKey, BPlusTreeNode *rightNode)
+{
+    if (leftNode->getParent() == nullptr)
+    {
+        BPlusTreeNode* newRoot = new BPlusTreeNode(false);
+
+        newRoot->getKeys().push_back(promotedKey);
+        newRoot->getChildren().push_back(leftNode);
+        newRoot->getChildren().push_back(rightNode);
+
+        leftNode->setParent(newRoot);
+        rightNode->setParent(newRoot);
+
+        root = newRoot;
+        return;
+    }
+
+    BPlusTreeNode* parent = leftNode->getParent();
+    vector<string>& parentKeys = parent->getKeys();
+    vector<BPlusTreeNode*>& parentChildren = parent->getChildren();
+
+    // Find where leftNode is in the parent's children
+    int childIndex = 0;
+    while (childIndex < static_cast<int>(parentChildren.size()) &&
+           parentChildren[childIndex] != leftNode)
+    {
+        childIndex++;
+    }
+
+    // Insert promoted key at the matching key position
+    parentKeys.insert(parentKeys.begin() + childIndex, promotedKey);
+
+    // Insert rightNode immediately after leftNode
+    parentChildren.insert(parentChildren.begin() + childIndex + 1, rightNode);
+
+    rightNode->setParent(parent);
+
+    if (static_cast<int>(parentKeys.size()) > maxKeys)
+    {
+        splitInternal(parent);
+    }
+}
+
+void BPlusTree::splitInternal(BPlusTreeNode *node)
+{
+    // Only split valid internal nodes
+    if (node == nullptr || node->getIsLeaf())
+    {
+        return;
+    }
+
+    vector<string>& keys = node->getKeys();
+    vector<BPlusTreeNode*>& children = node->getChildren();
+
+    // Find the middle key to promote
+    int midIndex = static_cast<int>(keys.size()) / 2;
+    string promotedKey = keys[midIndex];
+
+    // Create the new internal node
+    BPlusTreeNode* newInternal = new BPlusTreeNode(false);
+
+    vector<string>& newKeys = newInternal->getKeys();
+    vector<BPlusTreeNode*>& newChildren = newInternal->getChildren();
+
+    // Move keys AFTER the promoted key into the new internal node
+    newKeys.assign(keys.begin() + midIndex + 1, keys.end());
+
+    // Move the matching children into the new internal node
+    newChildren.assign(children.begin() + midIndex + 1, children.end());
+
+    // Update parent pointers of moved children
+    for (int i = 0; i < static_cast<int>(newChildren.size()); i++)
+    {
+        if (newChildren[i] != nullptr)
+        {
+            newChildren[i]->setParent(newInternal);
+        }
+    }
+
+    // Remove promoted key and moved keys from original node
+    keys.erase(keys.begin() + midIndex, keys.end());
+
+    // Remove moved children from original node
+    children.erase(children.begin() + midIndex + 1, children.end());
+
+    // Set new internal node's parent
+    newInternal->setParent(node->getParent());
+
+    // Insert promoted key into the parent
+    insertIntoParent(node, promotedKey, newInternal);
+}
+
 BPlusTreeNode* BPlusTree::findLeaf(const string& key){
     if(root == nullptr)
     {
@@ -223,3 +315,4 @@ void BPlusTree::deserialize(const string &dbFilename)
     // Close the file when finished
     outFile.close();
 }
+

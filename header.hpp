@@ -1,4 +1,5 @@
 #include "BplusTree.hpp"
+#pragma once
 
 void peekCSV(const string& filename);
 void uploadCSV(const string& filename, const string& primaryCol, BPlusTree& tree);
