@@ -270,11 +270,10 @@ void handleFind(const string &csvName, const string &keyValue)
     }
 }
 
+
 void run_app()
 {
-      int choice = 0;
-
-    cout << "Welcome to the B+ Tree CSV Indexer!" << endl;
+    int choice = 0;
 
     do
     {
@@ -287,7 +286,19 @@ void run_app()
         cout << "Enter your choice: ";
 
         cin >> choice;
-        cin.ignore(); // clears leftover newline after cin
+
+        // If user typed something that is not a number
+        if (cin.fail())
+        {
+            cout << "Invalid input. Please enter a number from 1 to 5." << endl;
+
+            cin.clear(); // remove fail state
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // discard bad input
+            continue;
+        }
+
+        // Remove leftover newline before using getline later
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         switch (choice)
         {
@@ -296,37 +307,28 @@ void run_app()
                 string filename;
                 cout << "Enter CSV filename: ";
                 getline(cin, filename);
-
                 handlePeek(filename);
                 break;
             }
 
             case 2:
             {
-                string filename;
-                string primaryCol;
-
+                string filename, primaryCol;
                 cout << "Enter CSV filename: ";
                 getline(cin, filename);
-
                 cout << "Enter primary key column name: ";
                 getline(cin, primaryCol);
-
                 handleUpload(filename, primaryCol);
                 break;
             }
 
             case 3:
             {
-                string csvName;
-                string keyValue;
-
+                string csvName, keyValue;
                 cout << "Enter CSV base name (without extension): ";
                 getline(cin, csvName);
-
                 cout << "Enter key value: ";
                 getline(cin, keyValue);
-
                 handleFind(csvName, keyValue);
                 break;
             }
