@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -g
 
 TARGET = program
 
-SRCS = BplusTree.cpp function.cpp main.cpp
+SRCS = PlusTree.cpp function.cpp main.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(TARGET)

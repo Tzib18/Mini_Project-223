@@ -78,48 +78,42 @@ private:
     void splitLeaf(BPlusTreeNode* leaf);
     void insertIntoParent(BPlusTreeNode* leftNode, const string& promotedKey, BPlusTreeNode* rightNode);
     void splitInternal(BPlusTreeNode* node);
+    void destroyTree(BPlusTreeNode* node);
 
 public:
-    // defualt constructor
-    BPlusTree() : root(nullptr), maxKeys(4) {} // default order
+    // Default constructor
+    BPlusTree() : root(nullptr), maxKeys(4) {}
 
     // Constructor
-    BPlusTree(int order){
+    BPlusTree(int order)
+    {
         root = nullptr;
-        maxKeys = order - 1; // max keys is order - 1
+        maxKeys = order - 1;
     }
 
-    // deconstructor 
-    ~BPlusTree(){
-        destroyTree(root);// calling helper function
+    // Destructor
+    ~BPlusTree()
+    {
+        destroyTree(root);
     }
 
     // Main public operations
     void insert(const string& key, const Record& record);
     Record* search(const string& key);
 
-    // Save/load index file later
+    // Save/load index file
     void serialize(const string& dbFilename);
     void deserialize(const string& dbFilename);
 
-    // Getter for root if needed for debugging
-    BPlusTreeNode* getRoot() const;
-
-    // helper functions
-    void destroyTree(BPlusTreeNode* node);
-    void insertIntoLeaf(BPlusTreeNode* leaf, const string& key, const Record& record);
-    void splitLeaf(BPlusTreeNode* leaf);
-    BPlusTreeNode* findleaf(const string& key);
-
-
-    // getters
-    BPlusTreeNode* getRoot() const{
+    // Getter
+    BPlusTreeNode* getRoot() const
+    {
         return root;
     }
 
-    // setters
-    void setRoot(BPlusTreeNode* r){
+    // Setter
+    void setRoot(BPlusTreeNode* r)
+    {
         root = r;
     }
-
 };
