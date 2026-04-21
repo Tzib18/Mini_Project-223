@@ -77,8 +77,8 @@ private:
     BPlusTreeNode* findLeaf(const string& key);
     void insertIntoLeaf(BPlusTreeNode* leaf, const string& key, const Record& record);
     void splitLeaf(BPlusTreeNode* leaf);
-    void insertIntoParent(BPlusTreeNode* leftNode, const string& promotedKey, BPlusTreeNode* rightNode);
-    void splitInternal(BPlusTreeNode* node);
+    //void insertIntoParent(BPlusTreeNode* leftNode, const string& promotedKey, BPlusTreeNode* rightNode);
+    //void splitInternal(BPlusTreeNode* node);
     void destroyTree(BPlusTreeNode* node);
 
 public:
