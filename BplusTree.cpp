@@ -457,24 +457,22 @@ void BPlusTree::serialize(const string& dbFilename)
 // ------------------------------------------------------------
 // DESERIALIZE
 // ------------------------------------------------------------
-// This function is supposed to load the tree back from disk.
+// This function loads the B+ tree back from the saved .db file.
 //
-// Important:
-// Your current version is not yet a real deserialize function.
-// Right now it opens an output file and writes data again, which
-// makes it behave more like another serialize function.
-//
-// What it should eventually do instead:
-// 1. Open the saved .db file for reading
-// 2. Read each line
-// 3. Split the line by '|'
-// 4. Rebuild the Record
-// 5. Insert the key/record back into a new tree
+// What it does:
+// 1. Opens the saved .db file for reading
+// 2. Reads each line from the file
+// 3. Splits each line using '|'
+// 4. Uses the first value as the key
+// 5. Stores the rest of the values inside a Record
+// 6. Inserts the key and record back into the B+ tree
 // ------------------------------------------------------------
 void BPlusTree::deserialize(const string& dbFilename)
 {
+    // Open the .db file for reading
     ifstream inFile(dbFilename);
 
+    // Make sure the file opened correctly
     if (!inFile.is_open())
     {
         cout << "Error: Could not open file " << dbFilename << " for reading." << endl;
@@ -483,8 +481,10 @@ void BPlusTree::deserialize(const string& dbFilename)
 
     string line;
 
+    // Read the file one full line at a time
     while (getline(inFile, line))
     {
+        // Skip blank lines
         if (line.empty())
         {
             continue;
@@ -494,27 +494,34 @@ void BPlusTree::deserialize(const string& dbFilename)
         string value;
         vector<string> parts;
 
+        // Split the line by the | symbol
         while (getline(ss, value, '|'))
         {
             parts.push_back(value);
         }
 
-        if (parts.size() == 0)
+        // If the line had no usable data, skip it
+        if (parts.empty())
         {
             continue;
         }
 
+        // The first part is the key
         string key = parts[0];
 
+        // Create a record to hold the row data
         Record record;
 
+        // Everything after the key is part of the record
         for (int i = 1; i < static_cast<int>(parts.size()); i++)
         {
             record.fields.push_back(parts[i]);
         }
 
+        // Insert the key and record back into the B+ tree
         insert(key, record);
     }
 
+    // Close the file
     inFile.close();
 }
