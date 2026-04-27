@@ -473,51 +473,48 @@ void BPlusTree::serialize(const string& dbFilename)
 // ------------------------------------------------------------
 void BPlusTree::deserialize(const string& dbFilename)
 {
-    // NOTE: This current version is incorrect for real deserialization.
-    // It opens the file for writing instead of reading.
-    ofstream outFile(dbFilename);
+    ifstream inFile(dbFilename);
 
-    // Check if the file opened
-    if (!outFile.is_open())
+    if (!inFile.is_open())
     {
-        cout << "Error: Could not open file " << dbFilename << " for writing." << endl;
+        cout << "Error: Could not open file " << dbFilename << " for reading." << endl;
         return;
     }
 
-    // If tree is empty, nothing happens
-    if (root == nullptr)
-    {
-        outFile.close();
-        return;
-    }
+    string line;
 
-    // Move to the leftmost leaf
-    BPlusTreeNode* current = root;
-    while (!current->getIsLeaf())
+    while (getline(inFile, line))
     {
-        current = current->getChildren()[0];
-    }
-
-    // Walk through leaves and write records again
-    while (current != nullptr)
-    {
-        vector<string>& keys = current->getKeys();
-        vector<Record>& records = current->getRecords();
-
-        for (int i = 0; i < static_cast<int>(keys.size()); i++)
+        if (line.empty())
         {
-            outFile << keys[i];
-
-            for (int j = 0; j < static_cast<int>(records[i].fields.size()); j++)
-            {
-                outFile << "|" << records[i].fields[j];
-            }
-
-            outFile << endl;
+            continue;
         }
 
-        current = current->getNext();
+        stringstream ss(line);
+        string value;
+        vector<string> parts;
+
+        while (getline(ss, value, '|'))
+        {
+            parts.push_back(value);
+        }
+
+        if (parts.size() == 0)
+        {
+            continue;
+        }
+
+        string key = parts[0];
+
+        Record record;
+
+        for (int i = 1; i < static_cast<int>(parts.size()); i++)
+        {
+            record.fields.push_back(parts[i]);
+        }
+
+        insert(key, record);
     }
 
-    outFile.close();
+    inFile.close();
 }
